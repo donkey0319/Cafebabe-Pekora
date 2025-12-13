@@ -1,0 +1,25 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{18449992-483F-6C4D-3E8C-7FA75DBDA242}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "Cafebabe",
+			"Type": "Runtime",
+			"LoadingPhase": "PostConfigInit",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
