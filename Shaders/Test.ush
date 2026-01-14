@@ -1,0 +1,34 @@
+int postprocess_input_idx = int(PP_idx);
+float2 TexelSize = float2(1.0f, 1.0f) / ViewSize;
+float2 uv = GetDefaultSceneTextureUV(Parameters, 8);
+
+// calculate all surrounding pixels coordinate
+float2 up_left = float2(uv.x - TexelSize.x, uv.y - TexelSize.y);
+float2 up_mid = float2(uv.x, uv.y - TexelSize.y);
+float2 up_right = float2(uv.x + TexelSize.x, uv.y - TexelSize.y);
+float2 mid_left = float2(uv.x - TexelSize.x, uv.y);
+float2 mid_mid = float2(uv.x, uv.y);
+float2 mid_right = float2(uv.x + TexelSize.x, uv.y);
+float2 bot_left = float2(uv.x - TexelSize.x, uv.y + TexelSize.y);
+float2 bot_mid = float2(uv.x, uv.y + TexelSize.y);
+float2 bot_right = float2(uv.x + TexelSize.x, uv.y + TexelSize.y);
+
+// sample colors from the texture
+float4 color_upleft = SceneTextureLookup(up_left, postprocess_input_idx, false);
+float4 color_upmid = SceneTextureLookup(up_mid, postprocess_input_idx, false);
+float4 color_upright = SceneTextureLookup(up_right, postprocess_input_idx, false);
+float4 color_midleft = SceneTextureLookup(mid_left, postprocess_input_idx, false);
+float4 color_midmid = SceneTextureLookup(mid_mid, postprocess_input_idx, false);
+float4 color_midright = SceneTextureLookup(mid_right, postprocess_input_idx, false);
+float4 color_botleft = SceneTextureLookup(bot_left, postprocess_input_idx, false);
+float4 color_botmid = SceneTextureLookup(bot_mid, postprocess_input_idx, false);
+float4 color_botright = SceneTextureLookup(bot_right, postprocess_input_idx, false);
+
+float4 Gx = (-1) * color_upleft + color_upright - 2 * color_midleft + 2 * color_midright - color_botleft + color_botright;
+float4 Gy = (-1) * color_upleft + color_botleft - 2 * color_upmid + 2 * color_botmid - color_upright + color_botright;
+
+float4 G_distance = Gx * Gx + Gy * Gy;
+G_distance = sqrt(G_distance);
+
+return float4(length(G_distance), length(G_distance), length(G_distance), length(G_distance));
+// return color_upleft;

@@ -1,0 +1,97 @@
+struct OutlineLib
+{
+	float3 rgb_to_hsv(float3 rgb)
+	{
+		float3 hsv;
+    
+		// Get min and max values
+		float min_val = min(min(rgb.r, rgb.g), rgb.b);
+		float max_val = max(max(rgb.r, rgb.g), rgb.b);
+		float delta = max_val - min_val;
+    
+		// Calculate HSV values
+		// Value (V)
+		hsv.z = max_val;
+    
+		// Saturation (S)
+		hsv.y = max_val > 0 ? delta / max_val : 0;
+    
+		// Hue (H)
+		hsv.x = 0; // Default hue
+    
+		if (delta > 0)
+		{
+			if (max_val == rgb.r)
+			{
+				hsv.x = (rgb.g - rgb.b) / delta;
+				if (rgb.g < rgb.b)
+					hsv.x += 6;
+			}
+			else if (max_val == rgb.g)
+			{
+				hsv.x = 2 + (rgb.b - rgb.r) / delta;
+			}
+			else // max_val == rgb.b
+			{
+				hsv.x = 4 + (rgb.r - rgb.g) / delta;
+			}
+        
+			hsv.x /= 6; // Convert to [0,1] range
+		}
+    
+		return hsv;
+	}
+
+	float3 hsv_to_rgb(float3 hsv)
+	{
+		float3 rgb;
+    
+		if (hsv.y == 0) // Achromatic (grey)
+		{
+			rgb = float3(hsv.z, hsv.z, hsv.z);
+			return rgb;
+		}
+    
+		float h = hsv.x * 6; // sector 0 to 5
+		int i = int(h);
+		float f = h - i; // factorial part of h
+		float p = hsv.z * (1 - hsv.y);
+		float q = hsv.z * (1 - hsv.y * f);
+		float t = hsv.z * (1 - hsv.y * (1 - f));
+    
+		switch (i)
+		{
+		case 0:
+			rgb = float3(hsv.z, t, p);
+			break;
+		case 1:
+			rgb = float3(q, hsv.z, p);
+			break;
+		case 2:
+			rgb = float3(p, hsv.z, t);
+			break;
+		case 3:
+			rgb = float3(p, q, hsv.z);
+			break;
+		case 4:
+			rgb = float3(t, p, hsv.z);
+			break;
+		default: // case 5:
+			rgb = float3(hsv.z, p, q);
+			break;
+		}
+    
+		return rgb;
+	}
+
+	float3 outline_color(float3 rgb)
+	{
+		float3 hsv = rgb_to_hsv(rgb);
+
+		float3 outline_hsv = float3(hsv.x, min(hsv.y + 0.03f, 1.0f), max(hsv.z - 0.03f, 0.0f));
+
+		// return hsv_to_rgb(hsv);
+		return hsv_to_rgb(outline_hsv);
+	}
+};
+
